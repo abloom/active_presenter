@@ -3,7 +3,7 @@ module ActivePresenter
   #
   class Base
     include ActiveSupport::Callbacks
-    define_callbacks :before_save, :after_save
+    define_callbacks :before_save, :after_save, :before_validation
     
     class_inheritable_accessor :presented
     self.presented = {}
@@ -87,6 +87,8 @@ module ActivePresenter
     # Returns boolean based on the validity of the presentables by calling valid? on each of them.
     #
     def valid?
+      return false unless run_callbacks_with_halt(:before_validation)
+      
       presented.keys.each do |type|
         presented_inst = send(type)
         
